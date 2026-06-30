@@ -1,0 +1,8 @@
+{
+  "request_id": "sample-allow-ticket-create",
+  "user": "alice@example.com",
+  "agent": "support-agent-001",
+  "target_app": "ticketing-api",
+  "action": "ticketing.create_ticket",
+  "requested_scope": "ticket:create"
+}
