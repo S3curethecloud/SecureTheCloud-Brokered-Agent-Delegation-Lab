@@ -18,6 +18,9 @@
   ],
   "properties": {
     "timestamp": { "type": "string", "format": "date-time" },
+    "demo_phase": { "type": "string" },
+    "demo_run_id": { "type": "string" },
+    "demo_generated_at": { "type": "string", "format": "date-time" },
     "request_id": { "type": "string" },
     "user": { "type": "string" },
     "agent": { "type": "string" },
@@ -29,10 +32,21 @@
     "policy_decision": { "type": "string", "enum": ["ALLOW", "DENY"] },
     "reason_code": { "type": "string" },
     "token_exchange": { "type": "string", "enum": ["SUCCESS", "FAILED", "NOT_ATTEMPTED"] },
+    "token_exchange_reason_code": { "type": "string" },
     "token_audience": { "type": "string" },
     "token_scope": { "type": "string" },
     "token_ttl_seconds": { "type": "integer" },
+    "token_jti": { "type": "string" },
     "api_access": { "type": "string", "enum": ["SUCCESS", "FAILED", "NOT_ATTEMPTED"] },
+    "api_authorization_decision": { "type": "string", "enum": ["ALLOW", "DENY", "NOT_ATTEMPTED"] },
+    "api_reason_code": { "type": "string" },
+    "api_target_app": { "type": "string" },
+    "api_required_scope": { "type": "string" },
+    "api_token_audience": { "type": "string" },
+    "api_token_scope": { "type": "string" },
+    "api_token_subject": { "type": "string" },
+    "api_token_actor": { "type": "string" },
+    "api_token_expired": { "type": "boolean" },
     "raw_token_logged": { "type": "boolean", "const": false }
   }
 }
