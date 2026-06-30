@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Brokered Agent Delegation Evidence Record",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "request_id",
+    "user",
+    "agent",
+    "target_app",
+    "action",
+    "requested_scope",
+    "policy_decision",
+    "reason_code",
+    "token_exchange",
+    "api_access",
+    "raw_token_logged"
+  ],
+  "properties": {
+    "timestamp": { "type": "string", "format": "date-time" },
+    "request_id": { "type": "string" },
+    "user": { "type": "string" },
+    "agent": { "type": "string" },
+    "target_app": { "type": "string" },
+    "action": { "type": "string" },
+    "requested_scope": { "type": "string" },
+    "data_classification": { "type": "string" },
+    "risk_tier": { "type": "string" },
+    "policy_decision": { "type": "string", "enum": ["ALLOW", "DENY"] },
+    "reason_code": { "type": "string" },
+    "token_exchange": { "type": "string", "enum": ["SUCCESS", "FAILED", "NOT_ATTEMPTED"] },
+    "token_audience": { "type": "string" },
+    "token_scope": { "type": "string" },
+    "token_ttl_seconds": { "type": "integer" },
+    "api_access": { "type": "string", "enum": ["SUCCESS", "FAILED", "NOT_ATTEMPTED"] },
+    "raw_token_logged": { "type": "boolean", "const": false }
+  }
+}
