@@ -2,6 +2,8 @@
 
 ## Phase 0 — Repository Foundation
 
+Status: Complete
+
 Goal: Establish the Source of Truth and architecture contract.
 
 Deliverables:
@@ -28,11 +30,13 @@ Exit criteria:
 
 ## Phase 1 — Deterministic Policy Simulation
 
+Status: Complete
+
 Goal: Build the first runnable authorization decision loop.
 
 Deliverables:
 
-- Local Python policy evaluator or OPA-based evaluator
+- Local Python policy evaluator
 - Config loader for users, apps, agents, and scopes
 - Allow/deny decision output
 - Evidence record generation
@@ -41,12 +45,14 @@ Deliverables:
 Core tests:
 
 - `ALLOW` ticket creation for approved user and agent
-- `DENY` HR salary read from prompt injection
+- `DENY` restricted access from prompt-injection-style requests
 - `DENY` broader scope than user has
 - `DENY` unknown app
 - `DENY` unknown agent
 
 ## Phase 2 — Mock Token Broker
+
+Status: Complete
 
 Goal: Simulate OAuth-style delegated token issuance.
 
@@ -65,30 +71,39 @@ Core tests:
 - Token contains correct human subject and agent actor
 - Token audience matches requested target app
 - Token lifetime does not exceed allowed TTL
+- Evidence stores metadata, not raw token material
 
 ## Phase 3 — Mock Enterprise APIs
+
+Status: Implemented
 
 Goal: Prove downstream systems independently enforce delegated token constraints.
 
 Deliverables:
 
-- `crm-api`
-- `ticketing-api`
-- `knowledge-api`
+- Mock CRM API validator
+- Mock Ticketing API validator
+- Mock Knowledge API validator
 - Audience validation
 - Scope validation
 - Expiration validation
-- API access evidence
+- Delegation context validation
+- API access evidence updates
 
 Core tests:
 
-- CRM accepts `customer:read` token with `aud=crm-api`
 - Ticketing accepts `ticket:create` token with `aud=ticketing-api`
-- Ticketing rejects CRM audience token
+- Ticketing rejects Knowledge API audience token
+- Knowledge API rejects Ticketing audience token
 - API rejects expired token
 - API rejects insufficient scope
+- API rejects missing delegation context
+- API rejects missing token
+- API rejects unknown target app
 
 ## Phase 4 — Optional Okta / External IdP Integration
+
+Status: Next
 
 Goal: Map the local pattern to a real enterprise identity provider.
 
@@ -109,6 +124,8 @@ Exit criteria:
 
 ## Phase 5 — Enterprise Hardening
 
+Status: Future
+
 Goal: Add advanced controls and presentation-ready evidence.
 
 Deliverables:
@@ -127,6 +144,6 @@ Deliverables:
 2. Implement the policy decision loop first.
 3. Add token broker only after allow/deny behavior is tested.
 4. Add mock APIs after token shape is stable.
-5. Add external IdP integration last.
+5. Add external IdP integration after local API-side enforcement is proven.
 
 This prevents the lab from turning into an identity-provider configuration exercise before the agent security pattern is proven.
