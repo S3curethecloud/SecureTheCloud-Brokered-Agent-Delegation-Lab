@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1900" viewBox="0 0 1400 1900" role="img" aria-labelledby="title desc">
+  <title id="title">SecureTheCloud Brokered Agent Delegation Lab Infographic</title>
+  <desc id="desc">Capability infographic showing cross-app access and brokered delegation for AI agents.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#061426"/>
+      <stop offset="0.55" stop-color="#071b33"/>
+      <stop offset="1" stop-color="#020814"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b2748"/>
+      <stop offset="1" stop-color="#07172d"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      .bg { fill: url(#bg); }
+      .panel { fill: rgba(7,23,45,0.92); stroke: #13bdf2; stroke-width: 2; rx: 20; }
+      .card { fill: url(#card); stroke: #1686c7; stroke-width: 2; rx: 18; }
+      .deny { fill: #121827; stroke: #ff5252; stroke-width: 3; rx: 18; }
+      .allow { fill: #102417; stroke: #5fe37a; stroke-width: 3; rx: 18; }
+      .text { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #eef7ff; }
+      .muted { fill: #b9cce1; }
+      .cyan { fill: #31d9ff; }
+      .orange { fill: #ff9b35; }
+      .green { fill: #6fed9a; }
+      .red { fill: #ff5f5f; }
+      .title { font-size: 54px; font-weight: 800; letter-spacing: -1px; }
+      .subtitle { font-size: 33px; font-weight: 700; }
+      .small { font-size: 22px; }
+      .section { font-size: 29px; font-weight: 800; }
+      .cardTitle { font-size: 28px; font-weight: 800; }
+      .body { font-size: 22px; line-height: 1.35; }
+      .label { font-size: 20px; font-weight: 700; }
+      .badge { fill: #0e5c9c; stroke: #33caff; stroke-width: 2; }
+      .line { stroke: #edf8ff; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #d9f4ff; stroke-width: 3; stroke-dasharray: 12 10; fill: none; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#edf8ff"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1400" height="1900"/>
+  <g opacity="0.16">
+    <path d="M0 120 H1400 M0 300 H1400 M0 480 H1400 M0 660 H1400 M0 840 H1400 M0 1020 H1400 M0 1200 H1400 M0 1380 H1400 M0 1560 H1400 M0 1740 H1400" stroke="#31d9ff"/>
+    <path d="M120 0 V1900 M300 0 V1900 M480 0 V1900 M660 0 V1900 M840 0 V1900 M1020 0 V1900 M1200 0 V1900" stroke="#31d9ff"/>
+  </g>
+
+  <text x="700" y="72" class="text title" text-anchor="middle">SecureTheCloud Brokered Agent Delegation Lab</text>
+  <text x="700" y="120" class="text subtitle cyan" text-anchor="middle">Cross-App Access &amp; Brokered Delegation for AI Agents</text>
+  <text x="700" y="158" class="text small muted" text-anchor="middle">Planned lab capability infographic</text>
+
+  <rect x="24" y="190" width="1352" height="335" class="panel"/>
+  <rect x="52" y="210" width="45" height="45" class="badge" rx="9"/><text x="75" y="242" class="text section" text-anchor="middle">1</text>
+  <text x="115" y="242" class="text section">WHAT THIS LAB DEMONSTRATES</text>
+
+  <g transform="translate(52 275)">
+    <rect width="288" height="210" class="card"/>
+    <text x="144" y="75" class="cyan cardTitle" text-anchor="middle">User-bound</text><text x="144" y="108" class="cyan cardTitle" text-anchor="middle">delegation</text>
+    <text x="144" y="150" class="text body" text-anchor="middle">Agent acts only on behalf</text><text x="144" y="180" class="text body" text-anchor="middle">of the triggering user</text>
+  </g>
+  <g transform="translate(382 275)">
+    <rect width="288" height="210" class="card"/>
+    <text x="144" y="72" class="cyan cardTitle" text-anchor="middle">OAuth 2.0</text><text x="144" y="105" class="cyan cardTitle" text-anchor="middle">token exchange</text>
+    <text x="144" y="148" class="text body" text-anchor="middle">Exchange a user token</text><text x="144" y="178" class="text body" text-anchor="middle">for scoped access</text>
+  </g>
+  <g transform="translate(712 275)">
+    <rect width="288" height="210" class="card"/>
+    <text x="144" y="72" class="cyan cardTitle" text-anchor="middle">Cross-app</text><text x="144" y="105" class="cyan cardTitle" text-anchor="middle">access</text>
+    <text x="144" y="148" class="text body" text-anchor="middle">Secure access through</text><text x="144" y="178" class="text body" text-anchor="middle">an agent broker</text>
+  </g>
+  <g transform="translate(1042 275)">
+    <rect width="288" height="210" class="card"/>
+    <text x="144" y="72" class="orange cardTitle" text-anchor="middle">Policy</text><text x="144" y="105" class="orange cardTitle" text-anchor="middle">enforcement</text>
+    <text x="144" y="148" class="text body" text-anchor="middle">User + agent + action</text><text x="144" y="178" class="text body" text-anchor="middle">+ target app allowed</text>
+  </g>
+
+  <rect x="24" y="555" width="1352" height="445" class="panel"/>
+  <rect x="52" y="575" width="45" height="45" class="badge" rx="9"/><text x="75" y="607" class="text section" text-anchor="middle">2</text>
+  <text x="115" y="607" class="text section">CORE ARCHITECTURE FLOW</text>
+
+  <g transform="translate(52 665)">
+    <rect width="145" height="120" class="card"/><text x="72" y="68" class="text label" text-anchor="middle">Human</text><text x="72" y="95" class="text label" text-anchor="middle">User</text>
+  </g>
+  <path d="M205 725 H255" class="line"/>
+  <g transform="translate(265 665)">
+    <rect width="145" height="120" class="card"/><text x="72" y="68" class="text label" text-anchor="middle">App /</text><text x="72" y="95" class="text label" text-anchor="middle">Client</text>
+  </g>
+  <path d="M418 725 H468" class="line"/>
+  <g transform="translate(478 665)">
+    <rect width="145" height="120" class="card"/><text x="72" y="68" class="text label" text-anchor="middle">Agent</text><text x="72" y="95" class="text label" text-anchor="middle">Gateway</text>
+  </g>
+  <path d="M631 725 H681" class="line"/>
+  <g transform="translate(691 665)">
+    <rect width="145" height="120" class="card"/><text x="72" y="68" class="text label" text-anchor="middle">Policy</text><text x="72" y="95" class="text label" text-anchor="middle">Engine</text>
+  </g>
+  <path d="M844 725 H894" class="line"/>
+  <g transform="translate(904 665)">
+    <rect width="145" height="120" class="card"/><text x="72" y="68" class="text label" text-anchor="middle">Token</text><text x="72" y="95" class="text label" text-anchor="middle">Broker</text>
+  </g>
+  <path d="M1057 725 H1107" class="line"/>
+  <g transform="translate(1117 665)">
+    <rect width="185" height="120" class="card"/><text x="92" y="68" class="text label" text-anchor="middle">Scoped</text><text x="92" y="95" class="text label" text-anchor="middle">Delegated Token</text>
+  </g>
+  <path d="M1302 725 H1340 V640" stroke="#edf8ff" stroke-width="4" fill="none"/>
+  <path d="M1340 725 H1340" stroke="#edf8ff" stroke-width="4"/>
+  <path d="M1340 725 V812" stroke="#edf8ff" stroke-width="4" fill="none"/>
+  <g transform="translate(1117 820)">
+    <rect width="185" height="54" class="card"/><text x="92" y="36" class="text label" text-anchor="middle">CRM API</text>
+    <rect y="68" width="185" height="54" class="card"/><text x="92" y="104" class="text label" text-anchor="middle">Ticketing API</text>
+    <rect y="136" width="185" height="54" class="card"/><text x="92" y="172" class="text label" text-anchor="middle">Knowledge API</text>
+  </g>
+  <path d="M550 795 V840 H850 V795" class="dash"/>
+  <rect x="380" y="850" width="640" height="80" class="card"/>
+  <text x="700" y="885" class="cyan cardTitle" text-anchor="middle">Evidence Ledger</text>
+  <text x="700" y="915" class="text body" text-anchor="middle">Decision + token exchange + access record</text>
+  <text x="700" y="965" class="text body" text-anchor="middle" font-style="italic">The agent never holds broad standing privileges. It receives short-lived, audience-bound, scope-limited delegated access.</text>
+
+  <rect x="24" y="1030" width="1352" height="330" class="panel"/>
+  <rect x="52" y="1050" width="45" height="45" class="badge" rx="9"/><text x="75" y="1082" class="text section" text-anchor="middle">3</text>
+  <text x="115" y="1082" class="text section">SECURITY GUARANTEES</text>
+  <g transform="translate(52 1135)">
+    <rect width="190" height="110" class="card"/><text x="95" y="48" class="green cardTitle" text-anchor="middle">✓</text><text x="95" y="82" class="text label" text-anchor="middle">Least privilege</text>
+  </g>
+  <g transform="translate(272 1135)">
+    <rect width="190" height="110" class="card"/><text x="95" y="48" class="green cardTitle" text-anchor="middle">✓</text><text x="95" y="82" class="text label" text-anchor="middle">Short-lived tokens</text>
+  </g>
+  <g transform="translate(492 1135)">
+    <rect width="190" height="110" class="card"/><text x="95" y="48" class="green cardTitle" text-anchor="middle">✓</text><text x="95" y="82" class="text label" text-anchor="middle">Audience-bound</text>
+  </g>
+  <g transform="translate(712 1135)">
+    <rect width="190" height="110" class="card"/><text x="95" y="48" class="green cardTitle" text-anchor="middle">✓</text><text x="95" y="82" class="text label" text-anchor="middle">Scope reduction</text>
+  </g>
+  <g transform="translate(932 1135)">
+    <rect width="190" height="110" class="card"/><text x="95" y="48" class="green cardTitle" text-anchor="middle">✓</text><text x="95" y="82" class="text label" text-anchor="middle">Deny by default</text>
+  </g>
+  <g transform="translate(1152 1135)">
+    <rect width="190" height="110" class="card"/><text x="95" y="48" class="green cardTitle" text-anchor="middle">✓</text><text x="95" y="82" class="text label" text-anchor="middle">Full audit evidence</text>
+  </g>
+  <rect x="52" y="1280" width="1290" height="56" fill="none" stroke="#ff9b35" stroke-width="3" rx="12"/>
+  <text x="700" y="1318" class="text cardTitle" text-anchor="middle"><tspan class="orange">Key principle:</tspan> The agent must never have more power than the human user.</text>
+
+  <rect x="24" y="1390" width="1352" height="230" class="panel"/>
+  <rect x="52" y="1410" width="45" height="45" class="badge" rx="9"/><text x="75" y="1442" class="text section" text-anchor="middle">4</text>
+  <text x="115" y="1442" class="text section">ABUSE AND DEFENSE SCENARIOS</text>
+  <g transform="translate(52 1480)">
+    <rect width="300" height="105" class="deny"/><text x="150" y="38" class="text body" text-anchor="middle">Prompt injection requests</text><text x="150" y="66" class="text body" text-anchor="middle">HR data</text><text x="150" y="96" class="red cardTitle" text-anchor="middle">✕ DENY</text>
+  </g>
+  <g transform="translate(382 1480)">
+    <rect width="300" height="105" class="deny"/><text x="150" y="38" class="text body" text-anchor="middle">Agent asks for broader</text><text x="150" y="66" class="text body" text-anchor="middle">scope than user has</text><text x="150" y="96" class="red cardTitle" text-anchor="middle">✕ DENY</text>
+  </g>
+  <g transform="translate(712 1480)">
+    <rect width="300" height="105" class="allow"/><text x="150" y="38" class="text body" text-anchor="middle">User is allowed to</text><text x="150" y="66" class="text body" text-anchor="middle">create ticket</text><text x="150" y="96" class="green cardTitle" text-anchor="middle">✓ ALLOW</text>
+  </g>
+  <g transform="translate(1042 1480)">
+    <rect width="300" height="105" class="deny"/><text x="150" y="38" class="text body" text-anchor="middle">Wrong audience token</text><text x="150" y="66" class="text body" text-anchor="middle">used against another app</text><text x="150" y="96" class="red cardTitle" text-anchor="middle">✕ DENY</text>
+  </g>
+
+  <rect x="24" y="1650" width="1352" height="185" class="panel"/>
+  <rect x="52" y="1670" width="45" height="45" class="badge" rx="9"/><text x="75" y="1702" class="text section" text-anchor="middle">5</text>
+  <text x="115" y="1702" class="text section">LAB DELIVERABLES</text>
+  <text x="155" y="1770" class="cyan cardTitle" text-anchor="middle">API</text><text x="155" y="1810" class="text label" text-anchor="middle">Mock enterprise APIs</text>
+  <text x="405" y="1770" class="cyan cardTitle" text-anchor="middle">&lt;/&gt;</text><text x="405" y="1810" class="text label" text-anchor="middle">Policy-as-code rules</text>
+  <text x="675" y="1770" class="cyan cardTitle" text-anchor="middle">Broker</text><text x="675" y="1810" class="text label" text-anchor="middle">Delegation service</text>
+  <text x="945" y="1770" class="cyan cardTitle" text-anchor="middle">Evidence</text><text x="945" y="1810" class="text label" text-anchor="middle">Records and tests</text>
+  <text x="1210" y="1770" class="cyan cardTitle" text-anchor="middle">Docs</text><text x="1210" y="1810" class="text label" text-anchor="middle">Threat model and architecture</text>
+
+  <rect x="24" y="1850" width="1352" height="36" fill="#0a3258" stroke="#13bdf2" rx="14"/>
+  <text x="700" y="1875" class="text small" text-anchor="middle">Ideal for enterprise IAM, AI governance, identity security, and secure agent architecture demonstrations.</text>
+</svg>
