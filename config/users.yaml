@@ -1,0 +1,45 @@
+users:
+  - user_id: alice@example.com
+    display_name: Alice Support Lead
+    roles:
+      - support_lead
+    groups:
+      - customer-support
+    allowed_scopes:
+      - customer:read
+      - ticket:create
+      - ticket:read
+      - runbook:read
+      - article:read
+    clearance:
+      - public
+      - internal
+      - confidential
+    max_risk_tier: medium
+
+  - user_id: bob@example.com
+    display_name: Bob Support Analyst
+    roles:
+      - support_analyst
+    groups:
+      - customer-support
+    allowed_scopes:
+      - customer:read
+      - ticket:read
+      - runbook:read
+    clearance:
+      - public
+      - internal
+    max_risk_tier: low
+
+  - user_id: mallory@example.com
+    display_name: Mallory Abuse Test User
+    roles:
+      - contractor
+    groups:
+      - limited-access
+    allowed_scopes:
+      - article:read
+    clearance:
+      - public
+    max_risk_tier: low
