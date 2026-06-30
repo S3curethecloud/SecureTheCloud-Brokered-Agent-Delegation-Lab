@@ -30,14 +30,17 @@ The lab models a secure brokered delegation pattern using:
 | Phase 2 | Complete | Mock token broker issues structured delegated tokens after policy approval |
 | Phase 3 | Complete | Mock enterprise APIs independently validate audience, scope, expiration, and delegation context |
 | Phase 4A | Complete | Local demo runner writes full-chain evidence JSON artifacts |
-| Phase 4A.1 | Implemented | Evidence review CLI turns latest JSON evidence into a clean demo summary |
-| Phase 4B | Next | Optional Okta/OIDC integration path |
+| Phase 4A.1 | Complete | Evidence review CLI turns latest JSON evidence into a clean demo summary |
+| Phase 4B | Implemented | Documentation-first Okta/OIDC integration planning gate |
+| Phase 5 | Next | Future external-token validation code and enterprise hardening implementation |
 
-Expected validation after Phase 4A.1:
+Expected validation after Phase 4B remains:
 
 ```text
 27 passed
 ```
+
+Phase 4B is documentation-only by design. It does not introduce tenant-specific values, secrets, or live IdP calls.
 
 ---
 
@@ -147,6 +150,26 @@ See:
 
 ---
 
+## Phase 4B: Okta / OIDC Integration Planning Gate
+
+Phase 4B maps the local proof to an external identity provider path without adding secrets or live tenant configuration.
+
+The planning gate includes:
+
+- [`docs/11-okta-oidc-integration-plan.md`](docs/11-okta-oidc-integration-plan.md)
+- [`docs/12-oauth-token-exchange-mapping.md`](docs/12-oauth-token-exchange-mapping.md)
+- [`docs/13-production-hardening-checklist.md`](docs/13-production-hardening-checklist.md)
+
+The integration stance is:
+
+```text
+Local deterministic proof first, external IdP integration second.
+```
+
+This keeps the project security-first. The current local controls remain the source of truth before introducing a real authorization server, tenant-specific issuer, JWKS validation, external token exchange, or production API credentials.
+
+---
+
 ## Phase 1: Policy Engine
 
 Phase 1 implements the deterministic authorization loop:
@@ -238,6 +261,7 @@ Implemented API wrappers:
 | API-side enforcement | Downstream systems independently validate token claims. |
 | Demo evidence | A full local run writes a reviewable JSON artifact. |
 | Evidence review | The latest evidence can be summarized for live demos. |
+| Integration gate | External IdP integration is planned before live configuration is introduced. |
 
 ---
 
@@ -273,6 +297,9 @@ Implemented API wrappers:
 │   ├── 08-mock-enterprise-apis.md
 │   ├── 09-local-demo-runner.md
 │   ├── 10-demo-walkthrough.md
+│   ├── 11-okta-oidc-integration-plan.md
+│   ├── 12-oauth-token-exchange-mapping.md
+│   ├── 13-production-hardening-checklist.md
 │   └── assets/
 │       └── brokered-agent-delegation-infographic.svg
 ├── config/
@@ -345,15 +372,20 @@ Complete.
 
 ### Phase 4A.1 — Evidence Review CLI and Demo Summary
 
+Complete.
+
+### Phase 4B — Okta / External IdP Integration Planning Gate
+
 Implemented.
 
-### Phase 4B — Okta / External IdP Integration Path
+### Phase 5 — External Token Validation and Enterprise Hardening
 
 Next:
 
-- Add optional Okta/OIDC setup documentation.
-- Add external token validation path.
-- Map user claims and groups to lab permissions.
+- Add external JWT/OIDC validation code.
+- Add claim-to-policy identity mapping.
+- Add optional external token exchange broker interface.
+- Keep secrets and tenant-specific values out of Git.
 
 ---
 
@@ -387,6 +419,14 @@ make demo
 make evidence
 ```
 
+Review the integration planning gate:
+
+```bash
+cat docs/11-okta-oidc-integration-plan.md
+cat docs/12-oauth-token-exchange-mapping.md
+cat docs/13-production-hardening-checklist.md
+```
+
 ---
 
 ## Portfolio Positioning
@@ -404,4 +444,4 @@ Use this lab to demonstrate enterprise-grade thinking across:
 
 Interview summary:
 
-> I built this lab to show how AI agents can act across enterprise systems without becoming overprivileged service accounts. The design uses a brokered delegation pattern where every action is bound to the triggering user, the agent capability manifest, the target application, the requested scope, and a policy decision. The agent receives only a short-lived, audience-bound delegated token, and each downstream API independently validates audience, scope, expiration, and delegation context before access is granted. The local demo runner produces audit-ready evidence for the full chain, and the evidence review CLI turns that artifact into a clean live-demo summary.
+> I built this lab to show how AI agents can act across enterprise systems without becoming overprivileged service accounts. The design uses a brokered delegation pattern where every action is bound to the triggering user, the agent capability manifest, the target application, the requested scope, and a policy decision. The agent receives only a short-lived, audience-bound delegated token, and each downstream API independently validates audience, scope, expiration, and delegation context before access is granted. The local demo runner produces audit-ready evidence for the full chain, the evidence review CLI turns that artifact into a clean live-demo summary, and the Okta/OIDC planning gate maps the local proof to external identity integration without introducing secrets too early.
