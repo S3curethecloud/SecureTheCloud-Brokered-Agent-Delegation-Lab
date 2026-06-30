@@ -29,13 +29,14 @@ The lab models a secure brokered delegation pattern using:
 | Phase 1 | Complete | Deterministic policy decision loop with pytest validation |
 | Phase 2 | Complete | Mock token broker issues structured delegated tokens after policy approval |
 | Phase 3 | Complete | Mock enterprise APIs independently validate audience, scope, expiration, and delegation context |
-| Phase 4A | Implemented | Local demo runner writes full-chain evidence JSON artifacts |
+| Phase 4A | Complete | Local demo runner writes full-chain evidence JSON artifacts |
+| Phase 4A.1 | Implemented | Evidence review CLI turns latest JSON evidence into a clean demo summary |
 | Phase 4B | Next | Optional Okta/OIDC integration path |
 
-Expected validation after Phase 4A:
+Expected validation after Phase 4A.1:
 
 ```text
-23 passed
+27 passed
 ```
 
 ---
@@ -92,52 +93,57 @@ flowchart LR
 
 ---
 
-## Local Demo Runner
+## Live Demo Flow
 
-Phase 4A adds an operator-friendly demo runner:
+Run validation:
 
-```text
-sample request
-  -> policy decision
-  -> token exchange
-  -> enterprise API validation
-  -> evidence JSON written to evidence/runs/
+```bash
+make validate
 ```
 
-Run the default demo:
+Generate a full-chain evidence file:
 
 ```bash
 make demo
 ```
 
-Or run the script directly:
+Review the latest evidence summary:
+
+```bash
+make evidence
+```
+
+Or run the scripts directly:
 
 ```bash
 python scripts/run_demo.py samples/requests/allow-ticket-create.json
+python scripts/show_latest_evidence.py
 ```
 
-The runner prints a summary like:
-
-```json
-{
-  "api_access": "SUCCESS",
-  "api_authorization_decision": "ALLOW",
-  "evidence_path": "evidence/runs/sample-allow-ticket-create-<run-id>.json",
-  "policy_decision": "ALLOW",
-  "request_id": "sample-allow-ticket-create",
-  "token_exchange": "SUCCESS"
-}
-```
-
-Generated evidence is written to:
+Expected evidence summary:
 
 ```text
-evidence/runs/
+SecureTheCloud Brokered Delegation Evidence Summary
+========================================================
+Request: sample-allow-ticket-create
+Policy: ALLOW
+Token Exchange: SUCCESS
+API Decision: ALLOW
+API Access: SUCCESS
+User: alice@example.com
+Agent: support-agent-001
+Target App: ticketing-api
+Scope: ticket:create
+Token Audience: ticketing-api
+API Reason: API_ACCESS_GRANTED
+Raw Token Logged: false
+Evidence File: evidence/runs/sample-allow-ticket-create-<run-id>.json
 ```
 
 See:
 
 - [`docs/09-local-demo-runner.md`](docs/09-local-demo-runner.md)
+- [`docs/10-demo-walkthrough.md`](docs/10-demo-walkthrough.md)
 
 ---
 
@@ -231,6 +237,7 @@ Implemented API wrappers:
 | Evidence-first governance | Every decision produces an audit-friendly evidence record. |
 | API-side enforcement | Downstream systems independently validate token claims. |
 | Demo evidence | A full local run writes a reviewable JSON artifact. |
+| Evidence review | The latest evidence can be summarized for live demos. |
 
 ---
 
@@ -265,6 +272,7 @@ Implemented API wrappers:
 │   ├── 07-build-roadmap.md
 │   ├── 08-mock-enterprise-apis.md
 │   ├── 09-local-demo-runner.md
+│   ├── 10-demo-walkthrough.md
 │   └── assets/
 │       └── brokered-agent-delegation-infographic.svg
 ├── config/
@@ -288,7 +296,8 @@ Implemented API wrappers:
 │       ├── allow-runbook-read.json
 │       └── allow-ticket-create.json
 ├── scripts/
-│   └── run_demo.py
+│   ├── run_demo.py
+│   └── show_latest_evidence.py
 ├── services/
 │   └── README.md
 ├── src/
@@ -297,12 +306,14 @@ Implemented API wrappers:
 │       ├── config_loader.py
 │       ├── demo_runner.py
 │       ├── enterprise_api.py
+│       ├── evidence_review.py
 │       ├── models.py
 │       ├── policy_engine.py
 │       └── token_broker.py
 └── tests/
     ├── test_demo_runner.py
     ├── test_enterprise_api.py
+    ├── test_evidence_review.py
     ├── test_plan.md
     ├── test_policy_engine.py
     └── test_token_broker.py
@@ -329,6 +340,10 @@ Complete.
 Complete.
 
 ### Phase 4A — Local Demo Runner and Evidence Output
+
+Complete.
+
+### Phase 4A.1 — Evidence Review CLI and Demo Summary
 
 Implemented.
 
@@ -365,16 +380,11 @@ make install
 make validate
 ```
 
-Run the local evidence demo:
+Run the local evidence demo and summary:
 
 ```bash
 make demo
-```
-
-Or:
-
-```bash
-python scripts/run_demo.py samples/requests/allow-ticket-create.json
+make evidence
 ```
 
 ---
@@ -394,4 +404,4 @@ Use this lab to demonstrate enterprise-grade thinking across:
 
 Interview summary:
 
-> I built this lab to show how AI agents can act across enterprise systems without becoming overprivileged service accounts. The design uses a brokered delegation pattern where every action is bound to the triggering user, the agent capability manifest, the target application, the requested scope, and a policy decision. The agent receives only a short-lived, audience-bound delegated token, and each downstream API independently validates audience, scope, expiration, and delegation context before access is granted. The local demo runner produces audit-ready evidence for the full chain.
+> I built this lab to show how AI agents can act across enterprise systems without becoming overprivileged service accounts. The design uses a brokered delegation pattern where every action is bound to the triggering user, the agent capability manifest, the target application, the requested scope, and a policy decision. The agent receives only a short-lived, audience-bound delegated token, and each downstream API independently validates audience, scope, expiration, and delegation context before access is granted. The local demo runner produces audit-ready evidence for the full chain, and the evidence review CLI turns that artifact into a clean live-demo summary.
