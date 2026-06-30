@@ -10,3 +10,5 @@ __pycache__/
 .DS_Store
 coverage.xml
 htmlcov/
+evidence/runs/*.json
+!evidence/runs/.gitkeep
