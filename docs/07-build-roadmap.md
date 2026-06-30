@@ -75,7 +75,7 @@ Core tests:
 
 ## Phase 3 — Mock Enterprise APIs
 
-Status: Implemented
+Status: Complete
 
 Goal: Prove downstream systems independently enforce delegated token constraints.
 
@@ -101,7 +101,30 @@ Core tests:
 - API rejects missing token
 - API rejects unknown target app
 
-## Phase 4 — Optional Okta / External IdP Integration
+## Phase 4A — Local Demo Runner and Evidence Output
+
+Status: Implemented
+
+Goal: Make the lab demo-friendly by generating full-chain evidence from a sample request.
+
+Deliverables:
+
+- Local demo runner module
+- CLI script for sample request execution
+- Evidence output directory
+- Demo evidence JSON generation
+- Tests for successful and denied demo paths
+- Documentation for operator usage
+
+Core tests:
+
+- Successful request writes evidence JSON
+- Denied request does not issue a delegated token
+- Denied request does not call downstream API
+- Request file can be loaded and executed
+- Evidence contains metadata, not raw token material
+
+## Phase 4B — Optional Okta / External IdP Integration
 
 Status: Next
 
@@ -144,6 +167,7 @@ Deliverables:
 2. Implement the policy decision loop first.
 3. Add token broker only after allow/deny behavior is tested.
 4. Add mock APIs after token shape is stable.
-5. Add external IdP integration after local API-side enforcement is proven.
+5. Add local demo runner before external IdP integration.
+6. Add external IdP integration after local evidence generation is proven.
 
 This prevents the lab from turning into an identity-provider configuration exercise before the agent security pattern is proven.
