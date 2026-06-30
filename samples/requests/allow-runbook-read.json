@@ -1,0 +1,8 @@
+{
+  "request_id": "sample-allow-runbook-read",
+  "user": "alice@example.com",
+  "agent": "support-agent-001",
+  "target_app": "knowledge-api",
+  "action": "knowledge.read_runbook",
+  "requested_scope": "runbook:read"
+}
