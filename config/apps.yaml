@@ -1,0 +1,48 @@
+apps:
+  - app_id: crm-api
+    name: Customer Relationship Management API
+    description: Mock CRM system for customer/account lookup.
+    accepted_scopes:
+      - customer:read
+    data_classifications:
+      - internal
+      - confidential
+    allowed_actions:
+      - crm.read_customer
+
+  - app_id: ticketing-api
+    name: Ticketing API
+    description: Mock ITSM/support ticketing system.
+    accepted_scopes:
+      - ticket:create
+      - ticket:read
+    data_classifications:
+      - internal
+    allowed_actions:
+      - ticketing.create_ticket
+      - ticketing.read_ticket
+
+  - app_id: knowledge-api
+    name: Knowledge API
+    description: Mock internal knowledge and runbook retrieval API.
+    accepted_scopes:
+      - runbook:read
+      - article:read
+    data_classifications:
+      - public
+      - internal
+    allowed_actions:
+      - knowledge.read_runbook
+      - knowledge.read_article
+
+  - app_id: hr-api
+    name: HR API
+    description: Mock restricted HR system used for deny and abuse-case testing.
+    accepted_scopes:
+      - employee:read
+      - salary:read
+    data_classifications:
+      - restricted
+    allowed_actions:
+      - hr.read_employee_profile
+      - hr.read_salary
