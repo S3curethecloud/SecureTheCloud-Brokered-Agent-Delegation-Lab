@@ -103,7 +103,7 @@ Core tests:
 
 ## Phase 4A — Local Demo Runner and Evidence Output
 
-Status: Implemented
+Status: Complete
 
 Goal: Make the lab demo-friendly by generating full-chain evidence from a sample request.
 
@@ -123,6 +123,27 @@ Core tests:
 - Denied request does not call downstream API
 - Request file can be loaded and executed
 - Evidence contains metadata, not raw token material
+
+## Phase 4A.1 — Evidence Review CLI and Demo Summary
+
+Status: Implemented
+
+Goal: Turn generated evidence into a clean, readable summary for interviews and live demos.
+
+Deliverables:
+
+- Evidence review utility module
+- Latest-evidence CLI script
+- Makefile shortcut for evidence review
+- Demo walkthrough documentation
+- Tests for evidence loading, latest-file selection, and summary formatting
+
+Core tests:
+
+- Latest evidence file can be discovered
+- Empty evidence directory fails clearly
+- Evidence JSON can be loaded
+- Human-readable summary includes request, policy, token, API, user, agent, app, scope, and raw-token status
 
 ## Phase 4B — Optional Okta / External IdP Integration
 
@@ -168,6 +189,7 @@ Deliverables:
 3. Add token broker only after allow/deny behavior is tested.
 4. Add mock APIs after token shape is stable.
 5. Add local demo runner before external IdP integration.
-6. Add external IdP integration after local evidence generation is proven.
+6. Add evidence review before external IdP integration.
+7. Add external IdP integration after local evidence generation and review are proven.
 
 This prevents the lab from turning into an identity-provider configuration exercise before the agent security pattern is proven.
