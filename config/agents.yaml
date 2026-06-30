@@ -1,0 +1,42 @@
+agents:
+  - agent_id: support-agent-001
+    name: Customer Support Delegation Agent
+    description: Agent approved to read customer context, retrieve support runbooks, and create support tickets on behalf of authorized users.
+    allowed_tools:
+      - crm.read_customer
+      - ticketing.create_ticket
+      - knowledge.read_runbook
+    denied_tools:
+      - hr.read_salary
+      - billing.update_payment
+      - admin.grant_role
+    allowed_target_apps:
+      - crm-api
+      - ticketing-api
+      - knowledge-api
+    max_risk_tier: medium
+    allowed_data_classifications:
+      - public
+      - internal
+      - confidential
+    requires_user_delegation: true
+    token_ttl_seconds: 300
+
+  - agent_id: hr-agent-001
+    name: HR Delegation Agent
+    description: Reserved future example for HR-specific delegation patterns. Disabled in Phase 0.
+    enabled: false
+    allowed_tools:
+      - hr.read_employee_profile
+    denied_tools:
+      - hr.read_salary
+      - admin.grant_role
+    allowed_target_apps:
+      - hr-api
+    max_risk_tier: high
+    allowed_data_classifications:
+      - internal
+      - confidential
+      - restricted
+    requires_user_delegation: true
+    token_ttl_seconds: 180
