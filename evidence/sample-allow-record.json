@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-06-30T12:00:00Z",
+  "request_id": "req-1001",
+  "user": "alice@example.com",
+  "agent": "support-agent-001",
+  "target_app": "ticketing-api",
+  "action": "ticketing.create_ticket",
+  "requested_scope": "ticket:create",
+  "data_classification": "internal",
+  "risk_tier": "medium",
+  "policy_decision": "ALLOW",
+  "reason_code": "USER_AND_AGENT_AUTHORIZED",
+  "token_exchange": "SUCCESS",
+  "token_audience": "ticketing-api",
+  "token_scope": "ticket:create",
+  "token_ttl_seconds": 300,
+  "api_access": "SUCCESS",
+  "raw_token_logged": false
+}
