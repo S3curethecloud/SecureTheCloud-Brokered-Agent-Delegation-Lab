@@ -15,9 +15,9 @@ The lab models a secure brokered delegation pattern using:
 - Agent gateway enforcement
 - Policy-as-code authorization
 - Audience-bound and scope-limited delegated tokens
-- Mock enterprise APIs
+- Mock enterprise API enforcement
 - Evidence records for every allow/deny decision
-- Abuse-case validation for prompt injection, scope escalation, wrong-audience token use, and unauthorized cross-app access
+- Abuse-case validation for prompt injection, scope escalation, wrong-audience token use, expired token reuse, and unauthorized cross-app access
 
 ---
 
@@ -27,16 +27,15 @@ The lab models a secure brokered delegation pattern using:
 |---|---|---|
 | Phase 0 | Complete | Source of Truth, architecture, threat model, policy/evidence contract, infographic |
 | Phase 1 | Complete | Deterministic policy decision loop with pytest validation |
-| Phase 2 | Implemented | Mock token broker issues structured delegated tokens after policy approval |
-| Phase 3 | Next | Mock enterprise APIs validate audience, scope, and expiration |
+| Phase 2 | Complete | Mock token broker issues structured delegated tokens after policy approval |
+| Phase 3 | Implemented | Mock enterprise APIs independently validate audience, scope, expiration, and delegation context |
+| Phase 4 | Next | Optional Okta/OIDC integration path |
 
-Validated locally so far:
+Expected validation after Phase 3:
 
 ```text
-7 passed in 0.09s
+20 passed
 ```
-
-After Phase 2, the expected test count increases because token broker tests are now included.
 
 ---
 
@@ -66,8 +65,6 @@ A repo-native SVG infographic is available here:
 
 - [`docs/assets/brokered-agent-delegation-infographic.svg`](docs/assets/brokered-agent-delegation-infographic.svg)
 
-The infographic summarizes the lab capability model, architecture flow, security guarantees, abuse scenarios, and deliverables.
-
 ---
 
 ## Core Architecture
@@ -94,7 +91,29 @@ flowchart LR
 
 ---
 
-## Phase 2 Token Broker
+## Phase 1: Policy Engine
+
+Phase 1 implements the deterministic authorization loop:
+
+```text
+request -> policy evaluation -> allow/deny decision -> evidence output
+```
+
+The policy engine checks:
+
+- User exists
+- Agent exists and is enabled
+- Target app exists
+- Requested scope exists
+- User has requested scope
+- Agent has requested capability
+- Target app accepts requested scope/action
+- User and agent are allowed for the data classification
+- Risk tier does not exceed user or agent limit
+
+---
+
+## Phase 2: Token Broker
 
 Phase 2 adds a mock token broker that simulates an OAuth-style delegated token exchange.
 
@@ -104,7 +123,7 @@ The broker follows this rule:
 No policy approval -> no delegated token.
 ```
 
-Allowed requests produce a structured token claim set with:
+Allowed requests produce a structured token claim set:
 
 ```json
 {
@@ -124,15 +143,38 @@ Allowed requests produce a structured token claim set with:
 
 Important: the lab stores token metadata in evidence, not raw bearer tokens.
 
-### Phase 2 files
+---
 
-```text
-src/brokered_delegation/models.py
-src/brokered_delegation/token_broker.py
-tests/test_token_broker.py
-samples/requests/allow-ticket-create.json
-samples/README.md
-```
+## Phase 3: Mock Enterprise API Enforcement
+
+Phase 3 proves that downstream enterprise APIs independently validate delegated tokens.
+
+The enterprise API layer checks:
+
+- Token exists
+- Token is not expired
+- Token audience matches the API
+- Token includes the required scope
+- Token includes human user context through `sub`
+- Token includes acting agent context through `act.sub`
+- Raw token material is not logged
+
+Implemented API wrappers:
+
+| API | Required Audience | Required Scope | Function |
+|---|---|---|---|
+| CRM API | `crm-api` | `customer:read` | `call_crm_api` |
+| Ticketing API | `ticketing-api` | `ticket:create` | `call_ticketing_api` |
+| Knowledge API | `knowledge-api` | `runbook:read` | `call_knowledge_api` |
+
+Phase 3 blocks:
+
+- Wrong-audience token reuse
+- Expired delegated tokens
+- Insufficient token scopes
+- Missing delegation context
+- Missing token
+- Unknown target app
 
 ---
 
@@ -144,8 +186,9 @@ samples/README.md
 | Least privilege | The downstream token contains only the approved scope. |
 | Audience-bound access | A token for one API cannot be reused against another API. |
 | Scope reduction | The broker cannot request broader authority than the user and policy allow. |
-| Deny by default | Unknown users, apps, agents, actions, or scopes are denied. |
+| Deny by default | Unknown users, apps, agents, actions, scopes, and APIs are denied. |
 | Evidence-first governance | Every decision produces an audit-friendly evidence record. |
+| API-side enforcement | Downstream systems independently validate token claims. |
 
 ---
 
@@ -176,10 +219,11 @@ The agent must not access:
 | Prompt injection asks the agent to read HR data | `DENY` |
 | Agent asks for broader scope than the user has | `DENY` |
 | User has permission and agent has capability to create a ticket | `ALLOW` |
-| CRM token is reused against Ticketing API | `DENY` |
-| User has permission but agent lacks capability | `DENY` |
-| Agent has capability but user lacks permission | `DENY` |
-| Expired delegated token is reused | `DENY` |
+| Knowledge token is reused against Ticketing API | `DENY` |
+| Ticketing token is reused against Knowledge API | `DENY` |
+| Token is expired | `DENY` |
+| Token lacks required scope | `DENY` |
+| Token lacks `act.sub` delegation context | `DENY` |
 
 ---
 
@@ -197,6 +241,7 @@ The agent must not access:
 │   ├── 05-policy-decision-model.md
 │   ├── 06-evidence-model.md
 │   ├── 07-build-roadmap.md
+│   ├── 08-mock-enterprise-apis.md
 │   └── assets/
 │       └── brokered-agent-delegation-infographic.svg
 ├── config/
@@ -211,6 +256,7 @@ The agent must not access:
 ├── samples/
 │   ├── README.md
 │   └── requests/
+│       ├── allow-runbook-read.json
 │       └── allow-ticket-create.json
 ├── services/
 │   └── README.md
@@ -218,6 +264,7 @@ The agent must not access:
 │   └── brokered_delegation/
 │       ├── __init__.py
 │       ├── config_loader.py
+│       ├── enterprise_api.py
 │       ├── models.py
 │       ├── policy_engine.py
 │       └── token_broker.py
@@ -226,6 +273,7 @@ The agent must not access:
 │   ├── sample-allow-record.json
 │   └── sample-deny-record.json
 └── tests/
+    ├── test_enterprise_api.py
     ├── test_plan.md
     ├── test_policy_engine.py
     └── test_token_broker.py
@@ -258,8 +306,9 @@ The agent must not access:
 
 ### Phase 3 — Mock Enterprise APIs
 
-- Add CRM, Ticketing, and Knowledge mock APIs.
+- Add CRM, Ticketing, and Knowledge mock API validators.
 - Validate token audience and scope at each API.
+- Validate token expiration.
 - Prove wrong-audience and over-scope calls fail.
 
 ### Phase 4 — Okta / External IdP Integration Path
@@ -312,12 +361,10 @@ Review the Source of Truth:
 cat docs/00-sot.md
 ```
 
-Review the capability model:
+Review the enterprise API enforcement doc:
 
 ```bash
-cat config/agents.yaml
-cat config/apps.yaml
-cat config/users.yaml
+cat docs/08-mock-enterprise-apis.md
 ```
 
 ---
@@ -331,9 +378,10 @@ Use this lab to demonstrate enterprise-grade thinking across:
 - Secure AI agent design
 - Cross-app access governance
 - Policy-as-code
+- API-side authorization enforcement
 - AI governance evidence
 - Least-privilege enterprise automation
 
 Interview summary:
 
-> I built this lab to show how AI agents can act across enterprise systems without becoming overprivileged service accounts. The design uses a brokered delegation pattern where every action is bound to the triggering user, the agent capability manifest, the target application, the requested scope, and a policy decision. The agent receives only a short-lived, audience-bound delegated token, and every allow or deny decision is recorded as evidence.
+> I built this lab to show how AI agents can act across enterprise systems without becoming overprivileged service accounts. The design uses a brokered delegation pattern where every action is bound to the triggering user, the agent capability manifest, the target application, the requested scope, and a policy decision. The agent receives only a short-lived, audience-bound delegated token, and each downstream API independently validates audience, scope, expiration, and delegation context before access is granted.
