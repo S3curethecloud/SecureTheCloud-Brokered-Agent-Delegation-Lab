@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-06-30T12:05:00Z",
+  "request_id": "req-1002",
+  "user": "alice@example.com",
+  "agent": "support-agent-001",
+  "target_app": "hr-api",
+  "action": "hr.read_salary",
+  "requested_scope": "salary:read",
+  "data_classification": "restricted",
+  "risk_tier": "high",
+  "policy_decision": "DENY",
+  "reason_code": "USER_LACKS_SCOPE_AND_AGENT_LACKS_CAPABILITY",
+  "token_exchange": "NOT_ATTEMPTED",
+  "api_access": "NOT_ATTEMPTED",
+  "raw_token_logged": false
+}
