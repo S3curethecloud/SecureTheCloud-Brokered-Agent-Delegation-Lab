@@ -5,6 +5,7 @@ This folder contains example JSON authorization requests for the brokered delega
 ## Included
 
 - `requests/allow-ticket-create.json` — approved support-ticket creation path for the customer support delegation agent.
+- `requests/allow-runbook-read.json` — approved knowledge runbook read path for the customer support delegation agent.
 
 ## Additional recommended local samples
 
