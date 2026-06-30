@@ -21,6 +21,25 @@ The lab models a secure brokered delegation pattern using:
 
 ---
 
+## Current Build Status
+
+| Phase | Status | Capability |
+|---|---|---|
+| Phase 0 | Complete | Source of Truth, architecture, threat model, policy/evidence contract, infographic |
+| Phase 1 | Complete | Deterministic policy decision loop with pytest validation |
+| Phase 2 | Implemented | Mock token broker issues structured delegated tokens after policy approval |
+| Phase 3 | Next | Mock enterprise APIs validate audience, scope, and expiration |
+
+Validated locally so far:
+
+```text
+7 passed in 0.09s
+```
+
+After Phase 2, the expected test count increases because token broker tests are now included.
+
+---
+
 ## Why This Lab Matters
 
 Enterprise AI agents are increasingly expected to act across SaaS, internal APIs, ticketing systems, CRM platforms, knowledge systems, identity systems, and data platforms.
@@ -71,6 +90,48 @@ flowchart LR
     CRM --> EV
     ITSM --> EV
     KB --> EV
+```
+
+---
+
+## Phase 2 Token Broker
+
+Phase 2 adds a mock token broker that simulates an OAuth-style delegated token exchange.
+
+The broker follows this rule:
+
+```text
+No policy approval -> no delegated token.
+```
+
+Allowed requests produce a structured token claim set with:
+
+```json
+{
+  "iss": "securethecloud-token-broker",
+  "sub": "alice@example.com",
+  "act": {
+    "sub": "support-agent-001"
+  },
+  "aud": "ticketing-api",
+  "scope": "ticket:create",
+  "delegation_type": "on_behalf_of",
+  "iat": 1893456700,
+  "exp": 1893457000,
+  "jti": "unique-token-id"
+}
+```
+
+Important: the lab stores token metadata in evidence, not raw bearer tokens.
+
+### Phase 2 files
+
+```text
+src/brokered_delegation/models.py
+src/brokered_delegation/token_broker.py
+tests/test_token_broker.py
+samples/requests/allow-ticket-create.json
+samples/README.md
 ```
 
 ---
@@ -147,19 +208,27 @@ The agent must not access:
 │   ├── agent_capabilities.rego
 │   ├── data_classification.rego
 │   └── delegated_access.rego
+├── samples/
+│   ├── README.md
+│   └── requests/
+│       └── allow-ticket-create.json
 ├── services/
-│   ├── agent-gateway/
-│   ├── policy-engine/
-│   ├── token-broker/
-│   ├── crm-api/
-│   ├── ticketing-api/
-│   └── knowledge-api/
+│   └── README.md
+├── src/
+│   └── brokered_delegation/
+│       ├── __init__.py
+│       ├── config_loader.py
+│       ├── models.py
+│       ├── policy_engine.py
+│       └── token_broker.py
 ├── evidence/
 │   ├── evidence-schema.json
 │   ├── sample-allow-record.json
 │   └── sample-deny-record.json
 └── tests/
-    └── test_plan.md
+    ├── test_plan.md
+    ├── test_policy_engine.py
+    └── test_token_broker.py
 ```
 
 ---
@@ -185,6 +254,7 @@ The agent must not access:
 - Simulate token exchange.
 - Issue mock delegated tokens with `sub`, `act`, `aud`, `scope`, `exp`, and `jti` claims.
 - Deny token minting when policy denies the action.
+- Preserve token metadata in evidence without logging raw bearer tokens.
 
 ### Phase 3 — Mock Enterprise APIs
 
@@ -209,13 +279,31 @@ The agent must not access:
 
 ## Quick Start
 
-This repository is being built in phases. Initial scaffold is documentation, configuration, policy model, and evidence design.
-
 Clone the repo:
 
 ```bash
 git clone https://github.com/S3curethecloud/SecureTheCloud-Brokered-Agent-Delegation-Lab.git
 cd SecureTheCloud-Brokered-Agent-Delegation-Lab
+```
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install and validate:
+
+```bash
+make install
+make validate
+```
+
+Run pytest directly:
+
+```bash
+pytest -q
 ```
 
 Review the Source of Truth:
