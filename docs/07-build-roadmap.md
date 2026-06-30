@@ -126,7 +126,7 @@ Core tests:
 
 ## Phase 4A.1 — Evidence Review CLI and Demo Summary
 
-Status: Implemented
+Status: Complete
 
 Goal: Turn generated evidence into a clean, readable summary for interviews and live demos.
 
@@ -145,42 +145,43 @@ Core tests:
 - Evidence JSON can be loaded
 - Human-readable summary includes request, policy, token, API, user, agent, app, scope, and raw-token status
 
-## Phase 4B — Optional Okta / External IdP Integration
+## Phase 4B — Okta / OIDC Integration Planning Gate
+
+Status: Implemented
+
+Goal: Map the local pattern to a real enterprise identity provider without introducing secrets or tenant-specific values.
+
+Deliverables:
+
+- Okta/OIDC integration planning document
+- OAuth token exchange mapping document
+- Production hardening checklist
+- OIDC claim mapping plan
+- External token exchange boundary plan
+- No-secret integration gate
+
+Core controls:
+
+- Local deterministic proof remains the source of truth
+- External identity is validated before policy evaluation
+- Token exchange is attempted only after policy `ALLOW`
+- Downstream API validation remains mandatory
+- Raw tokens and client secrets are never committed
+
+## Phase 5 — External Token Validation and Enterprise Hardening
 
 Status: Next
 
-Goal: Map the local pattern to a real enterprise identity provider.
+Goal: Add implementation code for external token validation and hardened broker interfaces after the planning gate is complete.
 
 Deliverables:
 
-- Okta setup guide
-- OIDC app configuration notes
-- Authorization server mapping
-- Group/claim mapping
-- External JWT validation path
-- Token exchange integration notes
-
-Exit criteria:
-
-- The local model can be compared directly to a real IdP delegation pattern.
-- No client secrets are committed.
-- The local security contract remains the source of truth.
-
-## Phase 5 — Enterprise Hardening
-
-Status: Future
-
-Goal: Add advanced controls and presentation-ready evidence.
-
-Deliverables:
-
-- Rich authorization request model
-- Sender-constrained token design notes
-- Risk-tier-aware policy
-- Dashboard/export format
-- Architecture review checklist
-- Demo script
-- Interview talking points
+- External JWT/OIDC validation module
+- OIDC claim-to-policy identity mapper
+- Optional external OAuth token exchange broker interface
+- Sample non-secret OIDC claim payloads
+- Tests for issuer, audience, expiration, group mapping, and fail-closed behavior
+- No committed tenant secrets
 
 ## Recommended Build Order
 
@@ -190,6 +191,7 @@ Deliverables:
 4. Add mock APIs after token shape is stable.
 5. Add local demo runner before external IdP integration.
 6. Add evidence review before external IdP integration.
-7. Add external IdP integration after local evidence generation and review are proven.
+7. Add OIDC/token-exchange planning before live IdP configuration.
+8. Add external validation code only after the integration gate is documented.
 
 This prevents the lab from turning into an identity-provider configuration exercise before the agent security pattern is proven.
