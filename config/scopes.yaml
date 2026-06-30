@@ -1,0 +1,48 @@
+scopes:
+  - scope: customer:read
+    target_app: crm-api
+    action: crm.read_customer
+    risk_tier: medium
+    data_classification: confidential
+
+  - scope: ticket:create
+    target_app: ticketing-api
+    action: ticketing.create_ticket
+    risk_tier: medium
+    data_classification: internal
+
+  - scope: ticket:read
+    target_app: ticketing-api
+    action: ticketing.read_ticket
+    risk_tier: low
+    data_classification: internal
+
+  - scope: runbook:read
+    target_app: knowledge-api
+    action: knowledge.read_runbook
+    risk_tier: low
+    data_classification: internal
+
+  - scope: article:read
+    target_app: knowledge-api
+    action: knowledge.read_article
+    risk_tier: low
+    data_classification: public
+
+  - scope: employee:read
+    target_app: hr-api
+    action: hr.read_employee_profile
+    risk_tier: high
+    data_classification: restricted
+
+  - scope: salary:read
+    target_app: hr-api
+    action: hr.read_salary
+    risk_tier: high
+    data_classification: restricted
+
+  - scope: admin:grant_role
+    target_app: admin-api
+    action: admin.grant_role
+    risk_tier: critical
+    data_classification: restricted
