@@ -1,0 +1,14 @@
+{
+  "iss": "https://untrusted-idp.example.com/oauth2/default",
+  "sub": "00u-unknown-user",
+  "aud": "wrong-audience",
+  "exp": 1000,
+  "iat": 900,
+  "email": "unknown@example.com",
+  "groups": [
+    "unknown-group"
+  ],
+  "scp": [
+    "admin:write"
+  ]
+}
