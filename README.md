@@ -16,6 +16,7 @@ The lab models a secure brokered delegation pattern using:
 - Policy-as-code authorization
 - Audience-bound and scope-limited delegated tokens
 - Mock enterprise API enforcement
+- External OIDC claim validation simulation
 - Evidence records for every allow/deny decision
 - Abuse-case validation for prompt injection, scope escalation, wrong-audience token use, expired token reuse, and unauthorized cross-app access
 
@@ -31,16 +32,17 @@ The lab models a secure brokered delegation pattern using:
 | Phase 3 | Complete | Mock enterprise APIs independently validate audience, scope, expiration, and delegation context |
 | Phase 4A | Complete | Local demo runner writes full-chain evidence JSON artifacts |
 | Phase 4A.1 | Complete | Evidence review CLI turns latest JSON evidence into a clean demo summary |
-| Phase 4B | Implemented | Documentation-first Okta/OIDC integration planning gate |
-| Phase 5 | Next | Future external-token validation code and enterprise hardening implementation |
+| Phase 4B | Complete | Documentation-first Okta/OIDC integration planning gate |
+| Phase 5A | Implemented | Non-secret OIDC claim validation and identity-to-policy mapping simulation |
+| Phase 5B | Next | External token validator interface and future JWKS-ready boundary |
 
-Expected validation after Phase 4B remains:
+Expected validation after Phase 5A:
 
 ```text
-27 passed
+43 passed
 ```
 
-Phase 4B is documentation-only by design. It does not introduce tenant-specific values, secrets, or live IdP calls.
+Phase 5A still does not introduce a live Okta tenant, client secrets, tenant-specific issuer values, or raw tokens.
 
 ---
 
@@ -57,42 +59,10 @@ Agent -> Admin API token -> Everything
 This lab demonstrates the safer pattern:
 
 ```text
-Human User -> Agent Gateway -> Policy Engine -> Token Broker -> Scoped Delegated Token -> Target Enterprise API -> Evidence
+Human User -> Validated Identity Claims -> Agent Gateway -> Policy Engine -> Token Broker -> Scoped Delegated Token -> Target Enterprise API -> Evidence
 ```
 
-The agent receives only the downstream access required for the approved task. Access is constrained by the human user's identity, the target app, requested action, agent capability, policy decision, token audience, token lifetime, downstream API validation, and evidence requirements.
-
----
-
-## Capability Infographic
-
-A repo-native SVG infographic is available here:
-
-- [`docs/assets/brokered-agent-delegation-infographic.svg`](docs/assets/brokered-agent-delegation-infographic.svg)
-
----
-
-## Core Architecture
-
-```mermaid
-flowchart LR
-    U[Human User] --> C[App / Client]
-    C --> AG[Agent Gateway]
-    AG --> PE[Policy Engine]
-    PE --> TB[Token Broker]
-    TB --> DT[Scoped Delegated Token]
-
-    DT --> CRM[CRM API]
-    DT --> ITSM[Ticketing API]
-    DT --> KB[Knowledge API]
-
-    AG --> EV[Evidence Ledger]
-    PE --> EV
-    TB --> EV
-    CRM --> EV
-    ITSM --> EV
-    KB --> EV
-```
+The agent receives only the downstream access required for the approved task. Access is constrained by the human user's identity, the target app, requested action, agent capability, policy decision, token audience, token lifetime, downstream API validation, external identity mapping, and evidence requirements.
 
 ---
 
@@ -123,30 +93,56 @@ python scripts/run_demo.py samples/requests/allow-ticket-create.json
 python scripts/show_latest_evidence.py
 ```
 
-Expected evidence summary:
+---
+
+## Phase 5A: External Claims Validation Simulation
+
+Phase 5A adds deterministic validation for non-secret OIDC-style claims.
+
+The simulation flow is:
 
 ```text
-SecureTheCloud Brokered Delegation Evidence Summary
-========================================================
-Request: sample-allow-ticket-create
-Policy: ALLOW
-Token Exchange: SUCCESS
-API Decision: ALLOW
-API Access: SUCCESS
-User: alice@example.com
-Agent: support-agent-001
-Target App: ticketing-api
-Scope: ticket:create
-Token Audience: ticketing-api
-API Reason: API_ACCESS_GRANTED
-Raw Token Logged: false
-Evidence File: evidence/runs/sample-allow-ticket-create-<run-id>.json
+sample OIDC claims
+  -> validate issuer/audience/exp/sub
+  -> map groups/scopes to local user policy context
+  -> feed existing policy engine
+  -> preserve fail-closed behavior
 ```
+
+Added files:
+
+```text
+src/brokered_delegation/oidc_claims.py
+src/brokered_delegation/identity_mapper.py
+samples/oidc/sample-access-token-claims.json
+samples/oidc/sample-invalid-token-claims.json
+tests/test_oidc_claims.py
+tests/test_identity_mapper.py
+docs/14-external-claims-validation.md
+```
+
+Important security invariant:
+
+```text
+Validated identity is not authorization.
+Authorization remains policy-driven.
+```
+
+The OIDC simulation validates:
+
+- trusted issuer
+- expected audience
+- subject presence
+- expiration
+- issued-at timestamp
+- groups
+- scopes
+
+The identity mapper then maps external claims into the existing local policy model. It does not create a second authorization path.
 
 See:
 
-- [`docs/09-local-demo-runner.md`](docs/09-local-demo-runner.md)
-- [`docs/10-demo-walkthrough.md`](docs/10-demo-walkthrough.md)
+- [`docs/14-external-claims-validation.md`](docs/14-external-claims-validation.md)
 
 ---
 
@@ -166,85 +162,30 @@ The integration stance is:
 Local deterministic proof first, external IdP integration second.
 ```
 
-This keeps the project security-first. The current local controls remain the source of truth before introducing a real authorization server, tenant-specific issuer, JWKS validation, external token exchange, or production API credentials.
-
 ---
 
-## Phase 1: Policy Engine
+## Core Architecture
 
-Phase 1 implements the deterministic authorization loop:
+```mermaid
+flowchart LR
+    U[Human User] --> OIDC[OIDC Claims]
+    OIDC --> IM[Identity Mapper]
+    IM --> AG[Agent Gateway]
+    AG --> PE[Policy Engine]
+    PE --> TB[Token Broker]
+    TB --> DT[Scoped Delegated Token]
 
-```text
-request -> policy evaluation -> allow/deny decision -> evidence output
+    DT --> CRM[CRM API]
+    DT --> ITSM[Ticketing API]
+    DT --> KB[Knowledge API]
+
+    AG --> EV[Evidence Ledger]
+    PE --> EV
+    TB --> EV
+    CRM --> EV
+    ITSM --> EV
+    KB --> EV
 ```
-
-The policy engine checks:
-
-- User exists
-- Agent exists and is enabled
-- Target app exists
-- Requested scope exists
-- User has requested scope
-- Agent has requested capability
-- Target app accepts requested scope/action
-- User and agent are allowed for the data classification
-- Risk tier does not exceed user or agent limit
-
----
-
-## Phase 2: Token Broker
-
-Phase 2 adds a mock token broker that simulates an OAuth-style delegated token exchange.
-
-The broker follows this rule:
-
-```text
-No policy approval -> no delegated token.
-```
-
-Allowed requests produce a structured token claim set:
-
-```json
-{
-  "iss": "securethecloud-token-broker",
-  "sub": "alice@example.com",
-  "act": {
-    "sub": "support-agent-001"
-  },
-  "aud": "ticketing-api",
-  "scope": "ticket:create",
-  "delegation_type": "on_behalf_of",
-  "iat": 1893456700,
-  "exp": 1893457000,
-  "jti": "unique-token-id"
-}
-```
-
-Important: the lab stores token metadata in evidence, not raw bearer tokens.
-
----
-
-## Phase 3: Mock Enterprise API Enforcement
-
-Phase 3 proves that downstream enterprise APIs independently validate delegated tokens.
-
-The enterprise API layer checks:
-
-- Token exists
-- Token is not expired
-- Token audience matches the API
-- Token includes the required scope
-- Token includes human user context through `sub`
-- Token includes acting agent context through `act.sub`
-- Raw token material is not logged
-
-Implemented API wrappers:
-
-| API | Required Audience | Required Scope | Function |
-|---|---|---|---|
-| CRM API | `crm-api` | `customer:read` | `call_crm_api` |
-| Ticketing API | `ticketing-api` | `ticket:create` | `call_ticketing_api` |
-| Knowledge API | `knowledge-api` | `runbook:read` | `call_knowledge_api` |
 
 ---
 
@@ -256,27 +197,13 @@ Implemented API wrappers:
 | Least privilege | The downstream token contains only the approved scope. |
 | Audience-bound access | A token for one API cannot be reused against another API. |
 | Scope reduction | The broker cannot request broader authority than the user and policy allow. |
-| Deny by default | Unknown users, apps, agents, actions, scopes, and APIs are denied. |
+| Deny by default | Unknown users, apps, agents, actions, scopes, APIs, groups, and issuers are denied. |
 | Evidence-first governance | Every decision produces an audit-friendly evidence record. |
 | API-side enforcement | Downstream systems independently validate token claims. |
 | Demo evidence | A full local run writes a reviewable JSON artifact. |
 | Evidence review | The latest evidence can be summarized for live demos. |
 | Integration gate | External IdP integration is planned before live configuration is introduced. |
-
----
-
-## Abuse and Defense Scenarios
-
-| Scenario | Expected Result |
-|---|---|
-| Prompt injection asks the agent to read restricted data | `DENY` |
-| Agent asks for broader scope than the user has | `DENY` |
-| User has permission and agent has capability to create a ticket | `ALLOW` |
-| Knowledge token is reused against Ticketing API | `DENY` |
-| Ticketing token is reused against Knowledge API | `DENY` |
-| Token is expired | `DENY` |
-| Token lacks required scope | `DENY` |
-| Token lacks `act.sub` delegation context | `DENY` |
+| Identity-not-authorization | Valid external claims still require policy approval. |
 
 ---
 
@@ -300,6 +227,7 @@ Implemented API wrappers:
 │   ├── 11-okta-oidc-integration-plan.md
 │   ├── 12-oauth-token-exchange-mapping.md
 │   ├── 13-production-hardening-checklist.md
+│   ├── 14-external-claims-validation.md
 │   └── assets/
 │       └── brokered-agent-delegation-infographic.svg
 ├── config/
@@ -318,6 +246,9 @@ Implemented API wrappers:
 │   ├── data_classification.rego
 │   └── delegated_access.rego
 ├── samples/
+│   ├── oidc/
+│   │   ├── sample-access-token-claims.json
+│   │   └── sample-invalid-token-claims.json
 │   ├── README.md
 │   └── requests/
 │       ├── allow-runbook-read.json
@@ -334,58 +265,21 @@ Implemented API wrappers:
 │       ├── demo_runner.py
 │       ├── enterprise_api.py
 │       ├── evidence_review.py
+│       ├── identity_mapper.py
 │       ├── models.py
+│       ├── oidc_claims.py
 │       ├── policy_engine.py
 │       └── token_broker.py
 └── tests/
     ├── test_demo_runner.py
     ├── test_enterprise_api.py
     ├── test_evidence_review.py
+    ├── test_identity_mapper.py
+    ├── test_oidc_claims.py
     ├── test_plan.md
     ├── test_policy_engine.py
     └── test_token_broker.py
 ```
-
----
-
-## Build Phases
-
-### Phase 0 — Source of Truth and Architecture
-
-Complete.
-
-### Phase 1 — Deterministic Policy Simulation
-
-Complete.
-
-### Phase 2 — Mock Token Broker
-
-Complete.
-
-### Phase 3 — Mock Enterprise APIs
-
-Complete.
-
-### Phase 4A — Local Demo Runner and Evidence Output
-
-Complete.
-
-### Phase 4A.1 — Evidence Review CLI and Demo Summary
-
-Complete.
-
-### Phase 4B — Okta / External IdP Integration Planning Gate
-
-Implemented.
-
-### Phase 5 — External Token Validation and Enterprise Hardening
-
-Next:
-
-- Add external JWT/OIDC validation code.
-- Add claim-to-policy identity mapping.
-- Add optional external token exchange broker interface.
-- Keep secrets and tenant-specific values out of Git.
 
 ---
 
@@ -419,12 +313,10 @@ make demo
 make evidence
 ```
 
-Review the integration planning gate:
+Review the external claims validation doc:
 
 ```bash
-cat docs/11-okta-oidc-integration-plan.md
-cat docs/12-oauth-token-exchange-mapping.md
-cat docs/13-production-hardening-checklist.md
+cat docs/14-external-claims-validation.md
 ```
 
 ---
@@ -439,9 +331,10 @@ Use this lab to demonstrate enterprise-grade thinking across:
 - Cross-app access governance
 - Policy-as-code
 - API-side authorization enforcement
+- External identity claim mapping
 - AI governance evidence
 - Least-privilege enterprise automation
 
 Interview summary:
 
-> I built this lab to show how AI agents can act across enterprise systems without becoming overprivileged service accounts. The design uses a brokered delegation pattern where every action is bound to the triggering user, the agent capability manifest, the target application, the requested scope, and a policy decision. The agent receives only a short-lived, audience-bound delegated token, and each downstream API independently validates audience, scope, expiration, and delegation context before access is granted. The local demo runner produces audit-ready evidence for the full chain, the evidence review CLI turns that artifact into a clean live-demo summary, and the Okta/OIDC planning gate maps the local proof to external identity integration without introducing secrets too early.
+> I built this lab to show how AI agents can act across enterprise systems without becoming overprivileged service accounts. The design uses a brokered delegation pattern where every action is bound to the triggering user, the agent capability manifest, the target application, the requested scope, and a policy decision. The agent receives only a short-lived, audience-bound delegated token, and each downstream API independently validates audience, scope, expiration, and delegation context before access is granted. The local demo runner produces audit-ready evidence for the full chain, the evidence review CLI turns that artifact into a clean live-demo summary, and the external claims simulation proves that validated identity is still not authorization until policy allows the action.
