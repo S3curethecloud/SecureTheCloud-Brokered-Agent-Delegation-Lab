@@ -21,13 +21,6 @@ Deliverables:
 - Policy skeletons
 - Evidence examples
 
-Exit criteria:
-
-- Repo can be cloned.
-- Lab purpose is clear.
-- Security invariants are documented.
-- Future implementation phases have a stable contract.
-
 ## Phase 1 — Deterministic Policy Simulation
 
 Status: Complete
@@ -42,14 +35,6 @@ Deliverables:
 - Evidence record generation
 - Unit tests for primary abuse cases
 
-Core tests:
-
-- `ALLOW` ticket creation for approved user and agent
-- `DENY` restricted access from prompt-injection-style requests
-- `DENY` broader scope than user has
-- `DENY` unknown app
-- `DENY` unknown agent
-
 ## Phase 2 — Mock Token Broker
 
 Status: Complete
@@ -63,15 +48,6 @@ Deliverables:
 - `sub`, `act`, `aud`, `scope`, `iat`, `exp`, and `jti` claims
 - Token exchange denied unless policy returns `ALLOW`
 - Evidence record for token exchange
-
-Core tests:
-
-- Token issued only after policy allow
-- Token not issued after policy deny
-- Token contains correct human subject and agent actor
-- Token audience matches requested target app
-- Token lifetime does not exceed allowed TTL
-- Evidence stores metadata, not raw token material
 
 ## Phase 3 — Mock Enterprise APIs
 
@@ -90,17 +66,6 @@ Deliverables:
 - Delegation context validation
 - API access evidence updates
 
-Core tests:
-
-- Ticketing accepts `ticket:create` token with `aud=ticketing-api`
-- Ticketing rejects Knowledge API audience token
-- Knowledge API rejects Ticketing audience token
-- API rejects expired token
-- API rejects insufficient scope
-- API rejects missing delegation context
-- API rejects missing token
-- API rejects unknown target app
-
 ## Phase 4A — Local Demo Runner and Evidence Output
 
 Status: Complete
@@ -116,14 +81,6 @@ Deliverables:
 - Tests for successful and denied demo paths
 - Documentation for operator usage
 
-Core tests:
-
-- Successful request writes evidence JSON
-- Denied request does not issue a delegated token
-- Denied request does not call downstream API
-- Request file can be loaded and executed
-- Evidence contains metadata, not raw token material
-
 ## Phase 4A.1 — Evidence Review CLI and Demo Summary
 
 Status: Complete
@@ -138,16 +95,9 @@ Deliverables:
 - Demo walkthrough documentation
 - Tests for evidence loading, latest-file selection, and summary formatting
 
-Core tests:
-
-- Latest evidence file can be discovered
-- Empty evidence directory fails clearly
-- Evidence JSON can be loaded
-- Human-readable summary includes request, policy, token, API, user, agent, app, scope, and raw-token status
-
 ## Phase 4B — Okta / OIDC Integration Planning Gate
 
-Status: Implemented
+Status: Complete
 
 Goal: Map the local pattern to a real enterprise identity provider without introducing secrets or tenant-specific values.
 
@@ -160,27 +110,55 @@ Deliverables:
 - External token exchange boundary plan
 - No-secret integration gate
 
-Core controls:
+## Phase 5A — External JWT/OIDC Claim Validation Simulation
 
-- Local deterministic proof remains the source of truth
-- External identity is validated before policy evaluation
-- Token exchange is attempted only after policy `ALLOW`
-- Downstream API validation remains mandatory
-- Raw tokens and client secrets are never committed
+Status: Implemented
 
-## Phase 5 — External Token Validation and Enterprise Hardening
-
-Status: Next
-
-Goal: Add implementation code for external token validation and hardened broker interfaces after the planning gate is complete.
+Goal: Validate non-secret OIDC-style claims and map them into the existing local policy model without live Okta configuration.
 
 Deliverables:
 
-- External JWT/OIDC validation module
-- OIDC claim-to-policy identity mapper
-- Optional external OAuth token exchange broker interface
-- Sample non-secret OIDC claim payloads
-- Tests for issuer, audience, expiration, group mapping, and fail-closed behavior
+- OIDC claim validation module
+- Identity mapper module
+- Non-secret valid sample claim payload
+- Non-secret invalid sample claim payload
+- Tests for issuer, audience, expiration, subject, scope, and group validation
+- Tests for claim-to-policy mapping and fail-closed behavior
+- Documentation for external claims validation
+
+Core tests:
+
+- Trusted issuer claims are accepted
+- Untrusted issuer claims are rejected
+- Wrong audience is rejected
+- Expired claims are rejected
+- Missing subject is rejected
+- Missing scopes are rejected
+- Valid claims map to an existing local user
+- Unknown groups fail closed
+- Unknown users fail closed
+- Requested scope must exist in external claims
+- Mapped request is evaluated by the existing policy engine
+
+Security invariant:
+
+```text
+Validated identity is not authorization.
+Authorization remains policy-driven.
+```
+
+## Phase 5B — External Token Validator Interface
+
+Status: Next
+
+Goal: Add an interface boundary that can later support JWKS-backed external token validation without changing the local policy engine contract.
+
+Deliverables:
+
+- External token validator interface
+- Mock JWKS-ready validation boundary
+- Tests for validator success/failure paths
+- Evidence fields for issuer, audience, validation result, and raw-token exclusion
 - No committed tenant secrets
 
 ## Recommended Build Order
@@ -192,6 +170,7 @@ Deliverables:
 5. Add local demo runner before external IdP integration.
 6. Add evidence review before external IdP integration.
 7. Add OIDC/token-exchange planning before live IdP configuration.
-8. Add external validation code only after the integration gate is documented.
+8. Add non-secret external claims simulation before live token validation.
+9. Add external validator interfaces only after claim mapping is tested.
 
 This prevents the lab from turning into an identity-provider configuration exercise before the agent security pattern is proven.
