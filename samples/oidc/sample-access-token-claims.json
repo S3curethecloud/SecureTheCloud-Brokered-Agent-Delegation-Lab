@@ -1,0 +1,17 @@
+{
+  "iss": "https://idp.example.com/oauth2/default",
+  "sub": "00u-alice-support-lead",
+  "aud": "brokered-agent-delegation-lab",
+  "exp": 4102444800,
+  "iat": 1893456000,
+  "email": "alice@example.com",
+  "groups": [
+    "customer-support"
+  ],
+  "scp": [
+    "customer:read",
+    "ticket:create",
+    "ticket:read",
+    "runbook:read"
+  ]
+}
