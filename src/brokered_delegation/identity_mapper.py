@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from .config_loader import load_config
-from .oidc_claims import OIDCValidationResult, validate_oidc_claims
+from .oidc_claims import OIDCValidationResult, normalize_claim_values, validate_oidc_claims
 from .policy_engine import Decision, evaluate_request
 
 
@@ -75,12 +75,8 @@ def map_claims_to_user_context(
     config = config or load_config()
     subject = claims.get("sub")
     email = claims.get("email")
-    groups = tuple(str(group) for group in claims.get("groups", []) if str(group))
-    scopes_value = claims.get("scp", claims.get("scope", []))
-    if isinstance(scopes_value, str):
-        scopes = tuple(item for item in scopes_value.split() if item)
-    else:
-        scopes = tuple(str(scope) for scope in scopes_value if str(scope))
+    groups = normalize_claim_values(claims.get("groups"))
+    scopes = normalize_claim_values(claims.get("scp", claims.get("scope", [])))
 
     if not subject:
         return IdentityMappingResult(False, "SUBJECT_MISSING")
